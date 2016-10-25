@@ -15,7 +15,7 @@ app.get('/', (req, res) => {
 })
 
 app.get('/data', (req, res) => {
-  setTimeout(() => res.sendFile(__dirname + '/data.json'), 5000)
+  res.sendFile(__dirname + '/data.json')
 })
 
 app.listen(port, (error) => {
