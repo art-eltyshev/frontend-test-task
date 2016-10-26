@@ -8,11 +8,15 @@ import {
 const initialState = {
   fetching: false,
   fetchingError: false,
-  flights: [],
-  filteredFlights: null
+  flightsEntities: {},
+  flightsOrigIds: [],
+  flightsIds: [],
+  carriers: []
 }
 
 export default function (state = initialState, action) {
+  let flightsIds;
+
   switch (action.type) {
     case GET_FLIGHTS_REQUEST:
       return {
@@ -21,12 +25,28 @@ export default function (state = initialState, action) {
         fetchingError: false
       }
     case GET_FLIGHTS_SUCCESS:
+      let flights = {}
+      flightsIds = []
+      let carriers = []
+
+      action.payload.flights.forEach(f => {
+        flightsIds.push(f.id)
+        flights[f.id] = f
+        if (carriers.indexOf(f.carrier) === -1) {
+          carriers.push(f.carrier)
+        }
+      })
+
+      carriers.sort()
+
       return {
         ...state,
         fetching: false,
         fetchingError: false,
-        flights: action.payload.flights,
-        filteredFlights: null
+        flightsEntities: flights,
+        flightsOrigIds: flightsIds,
+        flightsIds: flightsIds,
+        carriers: carriers
       }
     case GET_FLIGHTS_ERROR:
       return {
@@ -35,18 +55,22 @@ export default function (state = initialState, action) {
         fetchingError: true
       }
     case FILTER_FLIGHTS_BY_CARRIER:
+      flightsIds = []
+
       if (action.payload) {
-        return {
-          ...state,
-          filteredFlights: state.flights.filter(f => f.carrier === action.payload)
-        }
+        state.flightsOrigIds.forEach(k => {
+          if (state.flightsEntities[k].carrier === action.payload) {
+            flightsIds.push(k)
+          }
+        })
       } else {
-        return {
-          ...state,
-          filteredFlights: null
-        }
+        flightsIds = state.flightsOrigIds
       }
-      break
+
+      return {
+        ...state,
+        flightsIds: flightsIds
+      }
     default:
       return state
   }

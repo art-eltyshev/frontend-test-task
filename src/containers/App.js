@@ -11,16 +11,17 @@ class App extends Component {
   }
 
   render() {
-    const flights = this.props.filteredFlights || this.props.flights
+    const flights = this.props.flightsIds
+    const flightsEntities = this.props.flightsEntities
     return <div>
       <p>Flights list</p>
-      <CarrierSelect carriers={this.props.flights.map(f => f.carrier).filter((v, i, arr) => arr.indexOf(v) === i)} filterFlightsByCarrier={this.props.actions.filterFlightsByCarrier}/>
+      <CarrierSelect carriers={this.props.carriers} filterFlightsByCarrier={this.props.actions.filterFlightsByCarrier}/>
       {
         this.props.fetching ?
-          <div>{ this.props.fetchingError ? 'Error' : 'Loading...'}</div> :
-          flights.map(flight => {
+          <div>{ this.props.fetchingError ? 'Error' : 'Loading...' }</div> :
+          flights.map(f => {
             return (
-              <FlightInfo key={flight.id} data={flight} />
+              <FlightInfo key={f} data={flightsEntities[f]} />
             )
           })
       }
